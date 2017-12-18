@@ -16,7 +16,7 @@ public protocol UINodeDelegateProtocol: class {
 
 // MARK: - UINodeProtocol
 
-public protocol UINodeProtocol: class {
+public protocol UINodeProtocol: Disposable {
   /// Backing view for this node.
   var renderedView: UIView? { get }
   /// *Optional* delegate.
@@ -43,10 +43,10 @@ public protocol UINodeProtocol: class {
   func reconcile(in view: UIView?, size: CGSize?, options: [UINodeOption])
   /// Returns the node with the key matching the function argument.
   func nodeWithKey(_ key: String) -> UINodeProtocol?
-
+  
   // Internal.
 
-  /// Components that builds components in non-traditional fashion (e.g. table/collection views)
+  /// Component that builds components in non-traditional fashion (e.g. table/collection views)
   /// needs to keep track of their children by updating their root nodes 'unmanagedChildren'
   /// at every render pass.
   /// - note: *Internal use only*.
@@ -62,7 +62,7 @@ public protocol UINodeProtocol: class {
   var _debugStateDescription: String { get set }
   /// String representation of the current props.
   /// - note: *Internal use only*.
-  var _debugPropsDescription: String { get set }
+  var _debugPropDescription: String { get set }
   /// Asks the node to build the backing view for this node.
   /// - note: *Internal use only*.
   func _constructView(with reusableView: UIView?)
@@ -77,7 +77,7 @@ public protocol UINodeProtocol: class {
 
 public class UINode<V: UIView>: UINodeProtocol {
 
-  public struct UIViewConfiguration {
+  public struct Configuration {
     /// The target node for this layout pass.
     public internal(set) var node: UINode<V>
     /// The concrete backing view.
@@ -99,16 +99,15 @@ public class UINode<V: UIView>: UINodeProtocol {
     }
   }
 
-  public typealias UINodeCreationClosure = () -> V
-  public typealias UINodeConfigurationClosure = (UIViewConfiguration) -> Void
-  public typealias UINodeChildrenCreationClosure = (UIViewConfiguration) -> [UINodeProtocol]
+  public typealias CreationClosure = () -> V
+  public typealias ConfigurationClosure = (Configuration) -> Void
 
   public var reuseIdentifier: String
   public fileprivate(set) var renderedView: UIView? = nil
   public fileprivate(set) var children: [UINodeProtocol] = []
   public var _debugType: String
   public var _debugStateDescription: String = ""
-  public var _debugPropsDescription: String = ""
+  public var _debugPropDescription: String = ""
   public weak var delegate: UINodeDelegateProtocol?
   public weak var parent: UINodeProtocol?
   public weak var associatedComponent: UIComponentProtocol?
@@ -117,15 +116,20 @@ public class UINode<V: UIView>: UINodeProtocol {
   public var unmanagedChildren: [UINodeProtocol] = []
   public var overrides: ((UIView) -> Void)? = nil
 
+  /// Whether this object has been disposed or not.
+  /// Once an object is disposed it cannot be used any longer.
+  public var isDisposed: Bool = false
+
   // Private.
 
-  private let createClosure: UINodeCreationClosure
-  private var configClosure: UINodeConfigurationClosure = { _ in }
-  private var childrenClosure: UINodeConfigurationClosure = { _ in }
+  public var createClosure: CreationClosure
+  public var configClosure: ConfigurationClosure = { _ in }
   // 'true' whenever view just got created and added to the view hierarchy.
   private var shouldInvokeDidMount: Bool = false
   // The target object for the view binding method.
   private weak var bindTarget: AnyObject?
+  // Optional associated style.
+  private var styles: [UIStyleProtocol] = []
 
   // Internal.
 
@@ -154,7 +158,8 @@ public class UINode<V: UIView>: UINodeProtocol {
   public init(reuseIdentifier: String? = nil,
               key: String? = nil,
               create: (() -> V)? = nil,
-              configure: UINodeConfigurationClosure? = nil) {
+              styles: [UIStyleProtocol] = [],
+              configure: ConfigurationClosure? = nil) {
     self.reuseIdentifier = UINodeReuseIdentifierMake(type: V.self, identifier: reuseIdentifier)
     self._debugType =  String(describing: V.self)
     self.createClosure = create ??  { V() }
@@ -162,12 +167,13 @@ public class UINode<V: UIView>: UINodeProtocol {
       fatalError("Always specify a reuse identifier whenever a custom create closure is provided.")
     }
     self.key = key
+    self.styles = styles
     if let configure = configure {
       self.configClosure = configure
     }
   }
 
-  open func configure(_ configClosure: @escaping UINodeConfigurationClosure) {
+  open func configure(_ configClosure: @escaping ConfigurationClosure) {
     self.configClosure = configClosure
   }
 
@@ -190,16 +196,26 @@ public class UINode<V: UIView>: UINodeProtocol {
 
   public func _setup(in bounds: CGSize, options: [UINodeOption]) {
     assert(Thread.isMainThread)
+    guard !isDisposed else {
+      disposedWarning()
+      return
+    }
+
     _constructView()
     willLayout(options: options)
 
     let view = requireRenderedView()
     guard let renderedView = view as? V else {
-      print("Unexpected error: View/State/Props type mismatch.")
+      print("Unexpected error: View/State/Prop type mismatch.")
       return
     }
     view.renderContext.storeOldGeometryRecursively()
-    let viewConfiguration = UIViewConfiguration(node: self, view: renderedView, size: bounds)
+
+    for style in styles {
+      style.apply(to: view)
+    }
+
+    let viewConfiguration = Configuration(node: self, view: renderedView, size: bounds)
     configClosure(viewConfiguration)
     overrides?(view)
 
@@ -232,6 +248,11 @@ public class UINode<V: UIView>: UINodeProtocol {
   /// Re-applies the configuration for the node and compute its layout.
   public func layout(in bounds: CGSize, options: [UINodeOption] = []) {
     assert(Thread.isMainThread)
+    guard !isDisposed else {
+      disposedWarning()
+      return
+    }
+
     _setup(in: bounds, options: options)
 
     let view = requireRenderedView()
@@ -256,7 +277,7 @@ public class UINode<V: UIView>: UINodeProtocol {
     view.renderContext.storeNewGeometryRecursively()
     if let frameChangeAnimator = associatedComponent?.context?.layoutAnimator {
       view.renderContext.applyOldGeometryRecursively()
-      frameChangeAnimator.stopAnimation(false)
+      frameChangeAnimator.stopAnimation(true)
       frameChangeAnimator.addAnimations {
         view.renderContext.applyNewGeometryRecursively()
       }
@@ -275,7 +296,7 @@ public class UINode<V: UIView>: UINodeProtocol {
 
   private func willLayout(options: [UINodeOption]) {
     let view = requireRenderedView()
-    if options.contains(.preventDelegateCallbacks) {
+    if !options.contains(.preventDelegateCallbacks) {
       // Notify the delegate.
       delegate?.nodeWillLayout(self, view: view)
       associatedComponent?.nodeWillLayout(self, view: view)
@@ -288,7 +309,7 @@ public class UINode<V: UIView>: UINodeProtocol {
     if let UIPostRenderingView = view as? UIPostRendering {
       UIPostRenderingView.postRender()
     }
-    if options.contains(.preventDelegateCallbacks) {
+    if !options.contains(.preventDelegateCallbacks) {
       // Notify the delegate.
       delegate?.nodeDidLayout(self, view: view)
       associatedComponent?.nodeDidLayout(self, view: view)
@@ -305,6 +326,11 @@ public class UINode<V: UIView>: UINodeProtocol {
   /// Asks the node to build the backing view for this node.
   public func _constructView(with reusableView: UIView? = nil) {
     assert(Thread.isMainThread)
+    guard !isDisposed else {
+      disposedWarning()
+      return
+    }
+
     defer {
       bindIfNecessary(renderedView!)
     }
@@ -368,6 +394,11 @@ public class UINode<V: UIView>: UINodeProtocol {
   /// to a different level in the tree.
   public func reconcile(in view: UIView? = nil, size: CGSize? = nil, options: [UINodeOption] = []) {
     assert(Thread.isMainThread)
+    guard !isDisposed else {
+      disposedWarning()
+      return
+    }
+
     guard let view = view ?? renderedView?.superview else {
       return
     }
@@ -375,7 +406,7 @@ public class UINode<V: UIView>: UINodeProtocol {
 
     let startTime = CFAbsoluteTimeGetCurrent()
     _reconcile(node: self, size: size, view: view.subviews.first, parent: view)
-    layout(in: size)
+    layout(in: size, options: options)
 
     debugReconcileTime("\(Swift.type(of: self)).reconcile", startTime: startTime)
   }
@@ -390,6 +421,11 @@ public class UINode<V: UIView>: UINodeProtocol {
   public func bindView<O: AnyObject, V>(target: O,
                                         keyPath: ReferenceWritableKeyPath<O, V>) {
     assert(Thread.isMainThread)
+    guard !isDisposed else {
+      disposedWarning()
+      return
+    }
+
     bindTarget = target
     bindIfNecessary = { [weak self] (view: UIView) in
       guard let object = self?.bindTarget as? O, let view = view as? V else {
@@ -401,6 +437,10 @@ public class UINode<V: UIView>: UINodeProtocol {
 
   /// Returns the node with the key matching the function argument.
   public func nodeWithKey(_ key: String) -> UINodeProtocol? {
+    guard !isDisposed else {
+      disposedWarning()
+      return nil
+    }
     if self.key == key { return self }
     for child in children {
       if let result = child.nodeWithKey(key) {
@@ -416,10 +456,30 @@ public class UINode<V: UIView>: UINodeProtocol {
     func retrieveAllKeys(node: UINodeProtocol) {
       if let key = node.key { keys.insert(key) }
       node.children.forEach { node in retrieveAllKeys(node: node) }
-      node.unmanagedChildren.forEach {  node in retrieveAllKeys(node: node) }
+      node.unmanagedChildren.forEach { node in retrieveAllKeys(node: node) }
     }
     retrieveAllKeys(node: self)
     return keys
+  }
+
+  /// Dispose the object and makes it unusable.
+  public func dispose() {
+    isDisposed = true
+    for child in children { child.dispose() }
+    // Clears the closures.
+    createClosure = { V() }
+    configClosure = { _ in }
+    overrides = nil
+    // Resets all the targets of the target view.
+    renderedView?.resetAllTargets()
+    renderedView = nil
+    NotificationCenter.default.removeObserver(self)
+    children = []
+    // This properties are already 'nil' - we wipe them just for sake of consistency.
+    bindTarget = nil
+    delegate = nil
+    parent = nil
+    associatedComponent = nil
   }
 }
 

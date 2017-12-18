@@ -1,6 +1,6 @@
 import UIKit
 
-public protocol UIComponentProtocol: class, UINodeDelegateProtocol {
+public protocol UIComponentProtocol: UINodeDelegateProtocol, Disposable {
   /// The component-tree context.
   weak var context: UIContextProtocol? { get }
   /// A unique key for the component (necessary if the component is stateful).
@@ -11,10 +11,8 @@ public protocol UIComponentProtocol: class, UINodeDelegateProtocol {
   weak var delegate: UINodeDelegateProtocol? { get set }
   /// The component parent (nil for root components).
   weak var parent: UIComponentProtocol? { get }
-  /// The view in which the component is going to be rendered.
+  /// *IThe view in which the component is going to be rendered.
   weak var canvasView: UIView? { get }
-  /// Canvas bounding rect.
-  var canvasSize: () -> CGSize { get set }
   /// Set the canvas view for this component.
   /// - parameter view: The view in which the component is going to be rendered.
   /// - parameter useBoundsAsCanvasSize: if 'true' the canvas size will return the view bounds.
@@ -33,7 +31,7 @@ public protocol UIComponentProtocol: class, UINodeDelegateProtocol {
   var anyState: UIStateProtocol { get }
   /// Type-erased props associated to this component.
   /// - note: *Internal only.*
-  var anyProps: UIPropsProtocol { get }
+  var anyProp: UIPropsProtocol { get }
   /// Builds the component node.
   /// - note: Use this function to insert the node as a child of a pre-existent node hierarchy.
   func asNode() -> UINodeProtocol
@@ -51,7 +49,6 @@ public enum UIComponentCanvasOption: Int {
   /// Default canvas option.
   public static func defaults() -> [UIComponentCanvasOption] {
     return [.useBoundsAsCanvasSize,
-            .renderOnCanvasSizeChange,
             .flexibleHeight]
   }
 }
@@ -78,7 +75,7 @@ open class UIComponent<S: UIStateProtocol, P: UIPropsProtocol>: NSObject, UIComp
       setKey(node: root)
     }
   }
-  /// The component parent (nil for root components).
+  /// The component pa rent (nil for root components).
   public weak var parent: UIComponentProtocol?
   /// The state associated with this component.
   /// A state is always associated to a unique component key and it's a unique instance living
@@ -108,7 +105,7 @@ open class UIComponent<S: UIStateProtocol, P: UIPropsProtocol>: NSObject, UIComp
   }
   /// Use props to pass data & event handlers down to your child components.
   public var props: P = P()
-  public var anyProps: UIPropsProtocol { return props }
+  public var anyProp: UIPropsProtocol { return props }
   public var anyState: UIStateProtocol { return state }
   /// A unique key for the component (necessary if the component is stateful).
   public let key: String?
@@ -120,8 +117,10 @@ open class UIComponent<S: UIStateProtocol, P: UIPropsProtocol>: NSObject, UIComp
       assert(parent == nil, "Unable to set a canvas view on a non-root component.")
     }
   }
-  public var canvasSize: () -> CGSize = {
-    return CGSize(width: UIScreen.main.bounds.width, height: CGFloat.max)
+  /// The bounding rect for the the layout computation.
+  /// It can exceed the size of the canvas.
+  public var renderSize: () -> CGSize = {
+    return CGSize(width: UIScreen.main.bounds.size.width, height: CGFloat.max)
   }
 
   private var boundsObserver: UIContextViewBoundsObserver? = nil
@@ -135,15 +134,35 @@ open class UIComponent<S: UIStateProtocol, P: UIPropsProtocol>: NSObject, UIComp
     super.init()
     hookInspectorIfAvailable()
     hookHotReload()
+    logAlloc(type: String(describing: type(of: self)), object: self)
   }
+
+  deinit {
+    logDealloc(type: String(describing: type(of: self)), object: self)
+  }
+
+  /// Whether this object has been disposed or not.
+  /// Once an object is disposed it cannot be used any longer.
+  public var isDisposed: Bool = false
 
   public func setCanvas(view: UIView,
                         options: [UIComponentCanvasOption] = UIComponentCanvasOption.defaults()) {
+    assert(Thread.isMainThread)
+    guard !isDisposed else {
+      disposedWarning()
+      return
+    }
+
     canvasView = view
-    context?.canvasView = canvasView
+    context?._canvasView = canvasView
     if options.contains(.useBoundsAsCanvasSize) {
-      canvasSize = { [weak self] in
-        var size = self?.canvasView?.bounds.size ?? CGSize.zero
+      renderSize = { [weak self] in
+        var size = CGSize.zero
+        if let context = self?.context as? UIContext {
+          size = context.canvasSize
+        } else if let canvasViewBounds = self?.canvasView?.bounds.size {
+          size = canvasViewBounds
+        }
         size.height = options.contains(.flexibleHeight) ? CGFloat.max : size.height
         size.width = options.contains(.flexibleWidth) ? CGFloat.max : size.width
         return size
@@ -157,8 +176,25 @@ open class UIComponent<S: UIStateProtocol, P: UIPropsProtocol>: NSObject, UIComp
     }
   }
 
+  /// Called when ⌘ + R is pressed to reload the component.
+  func forceComponentReload() {
+    assert(Thread.isMainThread)
+    guard !isDisposed else {
+      disposedWarning()
+      return
+    }
+    guard parent == nil, canvasView != nil else { return }
+    self.setNeedsRender()
+    try? UIStylesheetManager.default.load(file: nil)
+  }
+
   public func setNeedsRender(options: [UIComponentRenderOption] = []) {
     assert(Thread.isMainThread)
+    guard !isDisposed else {
+      disposedWarning()
+      return
+    }
+
     guard parent == nil else {
       parent?.setNeedsRender(options: options)
       return
@@ -166,6 +202,10 @@ open class UIComponent<S: UIStateProtocol, P: UIPropsProtocol>: NSObject, UIComp
     guard let context = context, let view = canvasView else {
       fatalError("Attempting to render a component without a canvas view and/or a context.")
     }
+    // Updates the context's screen state.
+    context._screenStateFactory.bounds = renderSize()
+    UIStylesheetManager.default.canvasSize = renderSize()
+
     // Rendering is suspended for this context for the time being.
     // 'resumeFromSuspendedRenderingIfNecessary' will automatically be called when the render
     // context will be resumed.
@@ -191,18 +231,18 @@ open class UIComponent<S: UIStateProtocol, P: UIPropsProtocol>: NSObject, UIComp
       context.layoutAnimator = layoutAnimator
     }
     root = render(context: context)
-    root.reconcile(in: view, size: canvasSize(), options: [])
+    root.reconcile(in: view, size: renderSize(), options: [])
 
     context.didRenderRootComponent(self)
 
-    //context.flushObsoleteStates(validKeys: root._retrieveKeysRecursively())
+    //context.flushObsoleteState(validKeys: root._retrieveKeysRecursively())
     inspectorMarkDirty()
 
     // Reset the animatable frame changes to default.
     context.layoutAnimator = nil
 
     if propagateToParentContext, let parentContext = context._parentContext {
-      parentContext.pool.allComponents().filter { $0.parent == nil }.forEach {
+      parentContext.pool.allComponent().filter { $0.parent == nil }.forEach {
         $0.setNeedsRender(options: [.propagateToParentContext])
       }
     }
@@ -210,6 +250,11 @@ open class UIComponent<S: UIStateProtocol, P: UIPropsProtocol>: NSObject, UIComp
 
   public func resumeFromSuspendedRenderingIfNecessary() {
     assert(Thread.isMainThread)
+    guard !isDisposed else {
+      disposedWarning()
+      return
+    }
+
     guard setNeedsRenderCalledDuringSuspension else {
       return
     }
@@ -218,13 +263,26 @@ open class UIComponent<S: UIStateProtocol, P: UIPropsProtocol>: NSObject, UIComp
   }
 
   private func setKey(node: UINodeProtocol) {
+    assert(Thread.isMainThread)
+    guard !isDisposed else {
+      disposedWarning()
+      return
+    }
+
     if let key = key, node.key == nil {
       node.key = key
     }
     #if DEBUG
-    node._debugPropsDescription = props.reflectionDescription(del: UINodeInspectorDefaultDelimiters)
-    node._debugStateDescription = state.reflectionDescription(del: UINodeInspectorDefaultDelimiters)
+    node._debugPropDescription =
+      props.reflectionDescription(escape: UINodeInspectorDefaultDelimiters)
+    node._debugStateDescription =
+      state.reflectionDescription(escape: UINodeInspectorDefaultDelimiters)
     #endif
+  }
+
+  public func childKey<T>(_ type: T.Type, _ index: Int = -1) -> String {
+    let indexstr = index >= 0 ? "-\(index)" : ""
+    return childKey(string(fromType: type) + indexstr)
   }
 
   /// Returns the desired child key prefixed with the key of the father.
@@ -238,7 +296,6 @@ open class UIComponent<S: UIStateProtocol, P: UIPropsProtocol>: NSObject, UIComp
       }
     }
     findParentKeyRecursively(component: self)
-
     return "\(parentKey)-\(postfix)"
   }
 
@@ -290,6 +347,23 @@ open class UIComponent<S: UIStateProtocol, P: UIPropsProtocol>: NSObject, UIComp
 
   open func nodeDidLayout(_ node: UINodeProtocol, view: UIView) {
     delegate?.nodeDidLayout(node, view: view)
+  }
+
+  /// Dispose the object and makes it unusable.
+  public func dispose() {
+    isDisposed = true
+    // Resets props and state.
+    props = P()
+    renderSize = { CGSize.zero }
+    // Flushes all of the targets.
+    context = nil
+    delegate = nil
+    parent = nil
+    boundsObserver = nil
+    canvasView = nil
+    // Disposes the root node.
+    root.dispose()
+    NotificationCenter.default.removeObserver(self)
   }
 }
 

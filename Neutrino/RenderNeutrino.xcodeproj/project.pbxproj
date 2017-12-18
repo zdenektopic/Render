@@ -7,11 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		162560F91FA4D6660066AF05 /* JsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162560F81FA4D6660066AF05 /* JsBridge.swift */; };
-		1648AC1F1FA752800061A442 /* JsConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1648AC1E1FA752800061A442 /* JsConstants.swift */; };
+		16108B9C1FDC82B000CD9E9A /* Expression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16108B9B1FDC82B000CD9E9A /* Expression.swift */; };
+		16108B9E1FDDD1A700CD9E9A /* StylesheetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16108B9D1FDDD1A700CD9E9A /* StylesheetManager.swift */; };
+		16108BA11FDDD1C700CD9E9A /* StylesheetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16108B9F1FDDD1BC00CD9E9A /* StylesheetTests.swift */; };
+		161260861FB4E92F00524869 /* NodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161260851FB4E92F00524869 /* NodeTests.swift */; };
+		161260881FB4E92F00524869 /* RenderNeutrino.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16F36BE21F8E197A00A04BE6 /* RenderNeutrino.framework */; };
+		1648A1EC1FB505F400245AFA /* ContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1648A1EB1FB505F400245AFA /* ContextTests.swift */; };
+		165300BD1FD6D44C00A7BAB0 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165300BC1FD6D44C00A7BAB0 /* Debug.swift */; };
 		1656BAF61F9F750E009F561F /* TableComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1656BAF51F9F750E009F561F /* TableComponent.swift */; };
+		167070241FB8C232008DFC5B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167070231FB8C232008DFC5B /* ViewController.swift */; };
 		167B537A1FABB7A400AF6798 /* YGRenderAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 167B53791FABB7A400AF6798 /* YGRenderAdditions.m */; };
 		167B537C1FABB7B600AF6798 /* YGRenderAdditions.h in Sources */ = {isa = PBXBuildFile; fileRef = 167B537B1FABB7B600AF6798 /* YGRenderAdditions.h */; };
+		16A4FAAA1FDAC9B5007B9D71 /* Yaml.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A4FAA91FDAC9B5007B9D71 /* Yaml.swift */; };
 		16AA95E51FA3310600EAC136 /* UIView+Yoga.h in Headers */ = {isa = PBXBuildFile; fileRef = 16AA95DE1FA3310100EAC136 /* UIView+Yoga.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		16AA95E61FA3310600EAC136 /* UIView+Yoga.m in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95DF1FA3310100EAC136 /* UIView+Yoga.m */; };
 		16AA95E71FA3310600EAC136 /* YGEnums.c in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95DC1FA3310100EAC136 /* YGEnums.c */; };
@@ -28,58 +35,90 @@
 		16AA95F21FA3310600EAC136 /* Yoga.h in Headers */ = {isa = PBXBuildFile; fileRef = 16AA95DB1FA3310100EAC136 /* Yoga.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		16AA95F71FA3319B00EAC136 /* IGListCollectionViewLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 16AA95F61FA3319900EAC136 /* IGListCollectionViewLayout.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		16AA95F81FA3319E00EAC136 /* IGListCollectionViewLayout.mm in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F51FA3319900EAC136 /* IGListCollectionViewLayout.mm */; };
-		16AF33911FACAC5800379FA9 /* KeyCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AF33901FACAC5800379FA9 /* KeyCommands.swift */; };
-		16AF33931FACAD2500379FA9 /* ListDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AF33921FACAD2500379FA9 /* ListDiff.swift */; };
+		16AF33931FACAD2500379FA9 /* IGListDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AF33921FACAD2500379FA9 /* IGListDiff.swift */; };
 		16BB65921FABB98800373BB6 /* YGRenderAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 167B537B1FABB7B600AF6798 /* YGRenderAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		16CEC0161F9A125C003D3D21 /* Props.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CEC0151F9A125C003D3D21 /* Props.swift */; };
+		16D9F3321FE6CD7F00ADAB3D /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D9F3311FE6CD7F00ADAB3D /* Style.swift */; };
 		16DDA95D1F9799D200CDBCF5 /* Component.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DDA95C1F9799D200CDBCF5 /* Component.swift */; };
 		16DDA95F1F98C6CC00CDBCF5 /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DDA95E1F98C6CC00CDBCF5 /* Context.swift */; };
+		16E0CDB91FB84CD300BFF470 /* ComponentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E0CDB81FB84CD300BFF470 /* ComponentTests.swift */; };
 		16F36BE71F8E197A00A04BE6 /* RenderNeutrino.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F36BE51F8E197A00A04BE6 /* RenderNeutrino.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		16F36BEE1F8E198B00A04BE6 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F36BED1F8E198B00A04BE6 /* Node.swift */; };
 		16F36BF01F8E1A4700A04BE6 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F36BEF1F8E1A4700A04BE6 /* State.swift */; };
-		16F36BF21F8E2B2800A04BE6 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F36BF11F8E2B2800A04BE6 /* Extensions.swift */; };
+		16F36BF21F8E2B2800A04BE6 /* YGCommonAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F36BF11F8E2B2800A04BE6 /* YGCommonAdditions.swift */; };
 		16F36C191F8E4BA600A04BE6 /* KeyPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F36C181F8E4BA600A04BE6 /* KeyPath.swift */; };
-		16F7B55B1F9A322C00583082 /* Inspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F7B55A1F9A322C00583082 /* Inspector.swift */; };
+		16F5DD9B1FC1C108005E1497 /* YGPercentLayoutExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F5DD9A1FC1C108005E1497 /* YGPercentLayoutExtension.swift */; };
+		16F7B55B1F9A322C00583082 /* RenderInspectorHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F7B55A1F9A322C00583082 /* RenderInspectorHook.swift */; };
+		16FD2DAA1FB100A1005C2F9F /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FD2DA91FB100A1005C2F9F /* Geometry.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		161260891FB4E92F00524869 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 16F36BD91F8E197A00A04BE6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16F36BE11F8E197A00A04BE6;
+			remoteInfo = RenderNeutrino;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		162560F81FA4D6660066AF05 /* JsBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsBridge.swift; sourceTree = "<group>"; };
-		1648AC1E1FA752800061A442 /* JsConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsConstants.swift; sourceTree = "<group>"; };
+		16108B9B1FDC82B000CD9E9A /* Expression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Expression.swift; sourceTree = "<group>"; };
+		16108B9D1FDDD1A700CD9E9A /* StylesheetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StylesheetManager.swift; sourceTree = "<group>"; };
+		16108B9F1FDDD1BC00CD9E9A /* StylesheetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StylesheetTests.swift; sourceTree = "<group>"; };
+		161260831FB4E92E00524869 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		161260851FB4E92F00524869 /* NodeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeTests.swift; sourceTree = "<group>"; };
+		161260871FB4E92F00524869 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1648A1EB1FB505F400245AFA /* ContextTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextTests.swift; sourceTree = "<group>"; };
+		165300BC1FD6D44C00A7BAB0 /* Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
 		1656BAF51F9F750E009F561F /* TableComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableComponent.swift; sourceTree = "<group>"; };
-		167B53791FABB7A400AF6798 /* YGRenderAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = YGRenderAdditions.m; path = yoga/YGRenderAdditions.m; sourceTree = "<group>"; };
-		167B537B1FABB7B600AF6798 /* YGRenderAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = YGRenderAdditions.h; path = yoga/YGRenderAdditions.h; sourceTree = "<group>"; };
-		16AA95D71FA3310100EAC136 /* YGNodeList.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = YGNodeList.c; path = yoga/YGNodeList.c; sourceTree = "<group>"; };
-		16AA95D81FA3310100EAC136 /* YGPercentLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = YGPercentLayout.h; path = yoga/YGPercentLayout.h; sourceTree = "<group>"; };
-		16AA95D91FA3310100EAC136 /* YGNodeList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = YGNodeList.h; path = yoga/YGNodeList.h; sourceTree = "<group>"; };
-		16AA95DA1FA3310100EAC136 /* YGLayout+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "YGLayout+Private.h"; path = "yoga/YGLayout+Private.h"; sourceTree = "<group>"; };
-		16AA95DB1FA3310100EAC136 /* Yoga.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Yoga.h; path = yoga/Yoga.h; sourceTree = "<group>"; };
-		16AA95DC1FA3310100EAC136 /* YGEnums.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = YGEnums.c; path = yoga/YGEnums.c; sourceTree = "<group>"; };
-		16AA95DD1FA3310100EAC136 /* Yoga.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = Yoga.c; path = yoga/Yoga.c; sourceTree = "<group>"; };
-		16AA95DE1FA3310100EAC136 /* UIView+Yoga.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "UIView+Yoga.h"; path = "yoga/UIView+Yoga.h"; sourceTree = "<group>"; };
-		16AA95DF1FA3310100EAC136 /* UIView+Yoga.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "UIView+Yoga.m"; path = "yoga/UIView+Yoga.m"; sourceTree = "<group>"; };
-		16AA95E01FA3310100EAC136 /* YGLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = YGLayout.h; path = yoga/YGLayout.h; sourceTree = "<group>"; };
-		16AA95E11FA3310100EAC136 /* YGMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = YGMacros.h; path = yoga/YGMacros.h; sourceTree = "<group>"; };
-		16AA95E21FA3310100EAC136 /* YGEnums.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = YGEnums.h; path = yoga/YGEnums.h; sourceTree = "<group>"; };
-		16AA95E31FA3310100EAC136 /* YGLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = YGLayout.m; path = yoga/YGLayout.m; sourceTree = "<group>"; };
-		16AA95E41FA3310100EAC136 /* YGPercentLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = YGPercentLayout.m; path = yoga/YGPercentLayout.m; sourceTree = "<group>"; };
+		167070231FB8C232008DFC5B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		167B53791FABB7A400AF6798 /* YGRenderAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YGRenderAdditions.m; sourceTree = "<group>"; };
+		167B537B1FABB7B600AF6798 /* YGRenderAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YGRenderAdditions.h; sourceTree = "<group>"; };
+		16A4FAA91FDAC9B5007B9D71 /* Yaml.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Yaml.swift; sourceTree = "<group>"; };
+		16AA95D71FA3310100EAC136 /* YGNodeList.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = YGNodeList.c; sourceTree = "<group>"; };
+		16AA95D81FA3310100EAC136 /* YGPercentLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YGPercentLayout.h; sourceTree = "<group>"; };
+		16AA95D91FA3310100EAC136 /* YGNodeList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YGNodeList.h; sourceTree = "<group>"; };
+		16AA95DA1FA3310100EAC136 /* YGLayout+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "YGLayout+Private.h"; sourceTree = "<group>"; };
+		16AA95DB1FA3310100EAC136 /* Yoga.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Yoga.h; sourceTree = "<group>"; };
+		16AA95DC1FA3310100EAC136 /* YGEnums.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = YGEnums.c; sourceTree = "<group>"; };
+		16AA95DD1FA3310100EAC136 /* Yoga.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Yoga.c; sourceTree = "<group>"; };
+		16AA95DE1FA3310100EAC136 /* UIView+Yoga.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+Yoga.h"; sourceTree = "<group>"; };
+		16AA95DF1FA3310100EAC136 /* UIView+Yoga.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+Yoga.m"; sourceTree = "<group>"; };
+		16AA95E01FA3310100EAC136 /* YGLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YGLayout.h; sourceTree = "<group>"; };
+		16AA95E11FA3310100EAC136 /* YGMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YGMacros.h; sourceTree = "<group>"; };
+		16AA95E21FA3310100EAC136 /* YGEnums.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YGEnums.h; sourceTree = "<group>"; };
+		16AA95E31FA3310100EAC136 /* YGLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YGLayout.m; sourceTree = "<group>"; };
+		16AA95E41FA3310100EAC136 /* YGPercentLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YGPercentLayout.m; sourceTree = "<group>"; };
 		16AA95F51FA3319900EAC136 /* IGListCollectionViewLayout.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = IGListCollectionViewLayout.mm; sourceTree = "<group>"; };
 		16AA95F61FA3319900EAC136 /* IGListCollectionViewLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IGListCollectionViewLayout.h; sourceTree = "<group>"; };
-		16AF33901FACAC5800379FA9 /* KeyCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCommands.swift; sourceTree = "<group>"; };
-		16AF33921FACAD2500379FA9 /* ListDiff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDiff.swift; sourceTree = "<group>"; };
+		16AF33921FACAD2500379FA9 /* IGListDiff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGListDiff.swift; sourceTree = "<group>"; };
 		16CEC0151F9A125C003D3D21 /* Props.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Props.swift; sourceTree = "<group>"; };
+		16D9F3311FE6CD7F00ADAB3D /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
 		16DDA95C1F9799D200CDBCF5 /* Component.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Component.swift; sourceTree = "<group>"; };
 		16DDA95E1F98C6CC00CDBCF5 /* Context.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
+		16E0CDB81FB84CD300BFF470 /* ComponentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentTests.swift; sourceTree = "<group>"; };
 		16F36BE21F8E197A00A04BE6 /* RenderNeutrino.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RenderNeutrino.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		16F36BE51F8E197A00A04BE6 /* RenderNeutrino.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RenderNeutrino.h; sourceTree = "<group>"; };
 		16F36BE61F8E197A00A04BE6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		16F36BED1F8E198B00A04BE6 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		16F36BEF1F8E1A4700A04BE6 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
-		16F36BF11F8E2B2800A04BE6 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		16F36BF11F8E2B2800A04BE6 /* YGCommonAdditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YGCommonAdditions.swift; sourceTree = "<group>"; };
 		16F36C181F8E4BA600A04BE6 /* KeyPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPath.swift; sourceTree = "<group>"; };
-		16F7B55A1F9A322C00583082 /* Inspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inspector.swift; sourceTree = "<group>"; };
+		16F5DD9A1FC1C108005E1497 /* YGPercentLayoutExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YGPercentLayoutExtension.swift; sourceTree = "<group>"; };
+		16F7B55A1F9A322C00583082 /* RenderInspectorHook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderInspectorHook.swift; sourceTree = "<group>"; };
+		16FD2DA91FB100A1005C2F9F /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		161260801FB4E92E00524869 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				161260881FB4E92F00524869 /* RenderNeutrino.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		16F36BDE1F8E197A00A04BE6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -90,13 +129,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		162560F71FA4D6050066AF05 /* jsbridge */ = {
+		16108B9A1FDC80DE00CD9E9A /* stylesheet */ = {
 			isa = PBXGroup;
 			children = (
-				162560F81FA4D6660066AF05 /* JsBridge.swift */,
-				1648AC1E1FA752800061A442 /* JsConstants.swift */,
+				16D9F3311FE6CD7F00ADAB3D /* Style.swift */,
+				16108B9D1FDDD1A700CD9E9A /* StylesheetManager.swift */,
 			);
-			path = jsbridge;
+			path = stylesheet;
+			sourceTree = "<group>";
+		};
+		161260841FB4E92E00524869 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				16E0CDB81FB84CD300BFF470 /* ComponentTests.swift */,
+				1648A1EB1FB505F400245AFA /* ContextTests.swift */,
+				161260851FB4E92F00524869 /* NodeTests.swift */,
+				16108B9F1FDDD1BC00CD9E9A /* StylesheetTests.swift */,
+				161260871FB4E92F00524869 /* Info.plist */,
+			);
+			path = tests;
 			sourceTree = "<group>";
 		};
 		1656BAF41F9F74DE009F561F /* components */ = {
@@ -107,49 +158,6 @@
 			path = components;
 			sourceTree = "<group>";
 		};
-		16AA95D61FA330F700EAC136 /* yoga */ = {
-			isa = PBXGroup;
-			children = (
-				16AA95DE1FA3310100EAC136 /* UIView+Yoga.h */,
-				16AA95DF1FA3310100EAC136 /* UIView+Yoga.m */,
-				16AA95DC1FA3310100EAC136 /* YGEnums.c */,
-				16AA95E21FA3310100EAC136 /* YGEnums.h */,
-				16AA95E01FA3310100EAC136 /* YGLayout.h */,
-				16AA95E31FA3310100EAC136 /* YGLayout.m */,
-				16AA95DA1FA3310100EAC136 /* YGLayout+Private.h */,
-				16AA95E11FA3310100EAC136 /* YGMacros.h */,
-				16AA95D71FA3310100EAC136 /* YGNodeList.c */,
-				16AA95D91FA3310100EAC136 /* YGNodeList.h */,
-				16AA95D81FA3310100EAC136 /* YGPercentLayout.h */,
-				16AA95E41FA3310100EAC136 /* YGPercentLayout.m */,
-				16AA95DD1FA3310100EAC136 /* Yoga.c */,
-				16AA95DB1FA3310100EAC136 /* Yoga.h */,
-				167B537B1FABB7B600AF6798 /* YGRenderAdditions.h */,
-				167B53791FABB7A400AF6798 /* YGRenderAdditions.m */,
-			);
-			name = yoga;
-			sourceTree = "<group>";
-		};
-		16AA95F41FA3316D00EAC136 /* iglist */ = {
-			isa = PBXGroup;
-			children = (
-				16AA95F61FA3319900EAC136 /* IGListCollectionViewLayout.h */,
-				16AA95F51FA3319900EAC136 /* IGListCollectionViewLayout.mm */,
-				16AF33921FACAD2500379FA9 /* ListDiff.swift */,
-			);
-			path = iglist;
-			sourceTree = "<group>";
-		};
-		16AF338F1FACAC4100379FA9 /* inspector */ = {
-			isa = PBXGroup;
-			children = (
-				16F36BF11F8E2B2800A04BE6 /* Extensions.swift */,
-				16F7B55A1F9A322C00583082 /* Inspector.swift */,
-				16AF33901FACAC5800379FA9 /* KeyCommands.swift */,
-			);
-			path = inspector;
-			sourceTree = "<group>";
-		};
 		16F36BD81F8E197A00A04BE6 = {
 			isa = PBXGroup;
 			children = (
@@ -158,7 +166,8 @@
 				16F36BF31F8E2BEE00A04BE6 /* deps */,
 				16F36BE41F8E197A00A04BE6 /* src */,
 				1656BAF41F9F74DE009F561F /* components */,
-				162560F71FA4D6050066AF05 /* jsbridge */,
+				16108B9A1FDC80DE00CD9E9A /* stylesheet */,
+				161260841FB4E92E00524869 /* tests */,
 				16F36BE31F8E197A00A04BE6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -167,6 +176,7 @@
 			isa = PBXGroup;
 			children = (
 				16F36BE21F8E197A00A04BE6 /* RenderNeutrino.framework */,
+				161260831FB4E92E00524869 /* Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -176,10 +186,13 @@
 			children = (
 				16DDA95E1F98C6CC00CDBCF5 /* Context.swift */,
 				16DDA95C1F9799D200CDBCF5 /* Component.swift */,
+				165300BC1FD6D44C00A7BAB0 /* Debug.swift */,
 				16F36C181F8E4BA600A04BE6 /* KeyPath.swift */,
 				16F36BED1F8E198B00A04BE6 /* Node.swift */,
 				16CEC0151F9A125C003D3D21 /* Props.swift */,
 				16F36BEF1F8E1A4700A04BE6 /* State.swift */,
+				16FD2DA91FB100A1005C2F9F /* Geometry.swift */,
+				167070231FB8C232008DFC5B /* ViewController.swift */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -187,9 +200,30 @@
 		16F36BF31F8E2BEE00A04BE6 /* deps */ = {
 			isa = PBXGroup;
 			children = (
-				16AF338F1FACAC4100379FA9 /* inspector */,
-				16AA95F41FA3316D00EAC136 /* iglist */,
-				16AA95D61FA330F700EAC136 /* yoga */,
+				16AA95DE1FA3310100EAC136 /* UIView+Yoga.h */,
+				16AA95DF1FA3310100EAC136 /* UIView+Yoga.m */,
+				16AA95E21FA3310100EAC136 /* YGEnums.h */,
+				16AA95DC1FA3310100EAC136 /* YGEnums.c */,
+				16AA95E01FA3310100EAC136 /* YGLayout.h */,
+				16AA95E31FA3310100EAC136 /* YGLayout.m */,
+				16AA95DA1FA3310100EAC136 /* YGLayout+Private.h */,
+				16AA95E11FA3310100EAC136 /* YGMacros.h */,
+				16AA95D91FA3310100EAC136 /* YGNodeList.h */,
+				16AA95D71FA3310100EAC136 /* YGNodeList.c */,
+				16AA95D81FA3310100EAC136 /* YGPercentLayout.h */,
+				16AA95E41FA3310100EAC136 /* YGPercentLayout.m */,
+				16AA95DB1FA3310100EAC136 /* Yoga.h */,
+				16AA95DD1FA3310100EAC136 /* Yoga.c */,
+				16F36BF11F8E2B2800A04BE6 /* YGCommonAdditions.swift */,
+				167B537B1FABB7B600AF6798 /* YGRenderAdditions.h */,
+				167B53791FABB7A400AF6798 /* YGRenderAdditions.m */,
+				16F5DD9A1FC1C108005E1497 /* YGPercentLayoutExtension.swift */,
+				16AA95F61FA3319900EAC136 /* IGListCollectionViewLayout.h */,
+				16AA95F51FA3319900EAC136 /* IGListCollectionViewLayout.mm */,
+				16AF33921FACAD2500379FA9 /* IGListDiff.swift */,
+				16F7B55A1F9A322C00583082 /* RenderInspectorHook.swift */,
+				16A4FAA91FDAC9B5007B9D71 /* Yaml.swift */,
+				16108B9B1FDC82B000CD9E9A /* Expression.swift */,
 			);
 			path = deps;
 			sourceTree = "<group>";
@@ -218,6 +252,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		161260821FB4E92E00524869 /* Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1612608D1FB4E92F00524869 /* Build configuration list for PBXNativeTarget "Tests" */;
+			buildPhases = (
+				1612607F1FB4E92E00524869 /* Sources */,
+				161260801FB4E92E00524869 /* Frameworks */,
+				161260811FB4E92E00524869 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1612608A1FB4E92F00524869 /* PBXTargetDependency */,
+			);
+			name = Tests;
+			productName = Tests;
+			productReference = 161260831FB4E92E00524869 /* Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		16F36BE11F8E197A00A04BE6 /* RenderNeutrino */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 16F36BEA1F8E197A00A04BE6 /* Build configuration list for PBXNativeTarget "RenderNeutrino" */;
@@ -242,9 +294,14 @@
 		16F36BD91F8E197A00A04BE6 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0900;
 				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Alex Usbergo";
 				TargetAttributes = {
+					161260821FB4E92E00524869 = {
+						CreatedOnToolsVersion = 9.0;
+						ProvisioningStyle = Automatic;
+					};
 					16F36BE11F8E197A00A04BE6 = {
 						CreatedOnToolsVersion = 9.0;
 						LastSwiftMigration = 0900;
@@ -265,11 +322,19 @@
 			projectRoot = "";
 			targets = (
 				16F36BE11F8E197A00A04BE6 /* RenderNeutrino */,
+				161260821FB4E92E00524869 /* Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		161260811FB4E92E00524869 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		16F36BE01F8E197A00A04BE6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -280,29 +345,45 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1612607F1FB4E92E00524869 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16E0CDB91FB84CD300BFF470 /* ComponentTests.swift in Sources */,
+				16108BA11FDDD1C700CD9E9A /* StylesheetTests.swift in Sources */,
+				161260861FB4E92F00524869 /* NodeTests.swift in Sources */,
+				1648A1EC1FB505F400245AFA /* ContextTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		16F36BDD1F8E197A00A04BE6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				16AA95E61FA3310600EAC136 /* UIView+Yoga.m in Sources */,
 				16DDA95D1F9799D200CDBCF5 /* Component.swift in Sources */,
+				16FD2DAA1FB100A1005C2F9F /* Geometry.swift in Sources */,
 				167B537C1FABB7B600AF6798 /* YGRenderAdditions.h in Sources */,
 				16DDA95F1F98C6CC00CDBCF5 /* Context.swift in Sources */,
 				16F36C191F8E4BA600A04BE6 /* KeyPath.swift in Sources */,
-				1648AC1F1FA752800061A442 /* JsConstants.swift in Sources */,
-				16F7B55B1F9A322C00583082 /* Inspector.swift in Sources */,
-				16F36BF21F8E2B2800A04BE6 /* Extensions.swift in Sources */,
+				16F7B55B1F9A322C00583082 /* RenderInspectorHook.swift in Sources */,
+				16D9F3321FE6CD7F00ADAB3D /* Style.swift in Sources */,
+				167070241FB8C232008DFC5B /* ViewController.swift in Sources */,
+				16F36BF21F8E2B2800A04BE6 /* YGCommonAdditions.swift in Sources */,
+				16A4FAAA1FDAC9B5007B9D71 /* Yaml.swift in Sources */,
 				16AA95ED1FA3310600EAC136 /* YGNodeList.c in Sources */,
-				162560F91FA4D6660066AF05 /* JsBridge.swift in Sources */,
-				16AF33911FACAC5800379FA9 /* KeyCommands.swift in Sources */,
+				16F5DD9B1FC1C108005E1497 /* YGPercentLayoutExtension.swift in Sources */,
+				16108B9C1FDC82B000CD9E9A /* Expression.swift in Sources */,
 				16F36BEE1F8E198B00A04BE6 /* Node.swift in Sources */,
 				16F36BF01F8E1A4700A04BE6 /* State.swift in Sources */,
 				16AA95F01FA3310600EAC136 /* YGPercentLayout.m in Sources */,
 				1656BAF61F9F750E009F561F /* TableComponent.swift in Sources */,
 				16AA95E71FA3310600EAC136 /* YGEnums.c in Sources */,
+				165300BD1FD6D44C00A7BAB0 /* Debug.swift in Sources */,
 				16AA95F81FA3319E00EAC136 /* IGListCollectionViewLayout.mm in Sources */,
-				16AF33931FACAD2500379FA9 /* ListDiff.swift in Sources */,
+				16AF33931FACAD2500379FA9 /* IGListDiff.swift in Sources */,
 				16CEC0161F9A125C003D3D21 /* Props.swift in Sources */,
+				16108B9E1FDDD1A700CD9E9A /* StylesheetManager.swift in Sources */,
 				16AA95F11FA3310600EAC136 /* Yoga.c in Sources */,
 				16AA95EA1FA3310600EAC136 /* YGLayout.m in Sources */,
 				167B537A1FABB7A400AF6798 /* YGRenderAdditions.m in Sources */,
@@ -311,7 +392,41 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		1612608A1FB4E92F00524869 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16F36BE11F8E197A00A04BE6 /* RenderNeutrino */;
+			targetProxy = 161260891FB4E92F00524869 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		1612608B1FB4E92F00524869 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.render.Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1612608C1FB4E92F00524869 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.render.Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		16F36BE81F8E197A00A04BE6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -473,6 +588,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1612608D1FB4E92F00524869 /* Build configuration list for PBXNativeTarget "Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1612608B1FB4E92F00524869 /* Debug */,
+				1612608C1FB4E92F00524869 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		16F36BDC1F8E197A00A04BE6 /* Build configuration list for PBXProject "RenderNeutrino" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

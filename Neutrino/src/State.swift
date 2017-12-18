@@ -13,7 +13,7 @@ public protocol UIStateProtocol: class, ReflectedStringConvertible {
 }
 
 public final class UINilState: UIStateProtocol, Codable {
-  static let `nil` = UINilState()
+  public static let `nil` = UINilState()
   public init() { }
 }
 
@@ -27,14 +27,14 @@ public protocol ReflectedStringConvertible : CustomStringConvertible {}
 extension ReflectedStringConvertible {
   /// Returns a representation of the state in the form:
   /// Type(prop1: 'value', prop2: 'value'..)
-  func reflectionDescription(del: String = "") -> String {
+  func reflectionDescription(escape: String = "") -> String {
     let mirror = Mirror(reflecting: self)
     var str = ""
     var first = true
     for (label, value) in mirror.children {
       if let label = label {
         if first { first = false } else {  str += ", "  }
-        str += "\(del)\(label)\(del): \(del)\(value)\(del)"
+        str += "\(escape)\(label)\(escape): \(escape)\(value)\(escape)"
       }
     }
     return "{ \(str) }"

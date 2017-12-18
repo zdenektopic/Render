@@ -1,12 +1,30 @@
 import UIKit
 
-// MARK: - UITableViewComponentProps
+// MARK: - UITableViewComponentProp
+
+open class UITableCellProps: UIPropsProtocol {
+  public required init() { }
+  /// Cell title.
+  public var title = String()
+  /// Cell subtitle.
+  public var subtitle = String()
+  /// Automatically set to 'true' whenever the cell is being highlighted.
+  public var isHighlighted: Bool = false
+  /// The closure that is going to be executed whenever the cell is selected.
+  public var onCellSelected: (() -> Void)? = nil
+
+  public init(title: String, subtitle: String = "", onCellSelected: @escaping () -> Void) {
+    self.title = title
+    self.subtitle = subtitle
+    self.onCellSelected = onCellSelected
+  }
+}
 
 public class UITableComponentProps: UIPropsProtocol {
   /// Represents a table view section.
   public struct Section {
     /// The list of components that are going to be shown in this section.
-    public var cells: [UICell]
+    public var cells: [UICellDescriptor]
     /// A node able to render this section header.
     /// - note: Optional.
     public var header: UISectionHeader?
@@ -15,8 +33,12 @@ public class UITableComponentProps: UIPropsProtocol {
       let set: Set<String> = Set(cells.flatMap { $0.component.key })
       return set.count == cells.count
     }
+    /// *Optional optimisation* if the rows in this section have a pre-defined height,
+    /// this will improve the overall component render time.
+    public var defaultRowHeight: CGFloat? = nil
+    public var estimatedRowHeight: CGFloat = 64
 
-    public init(cells: [UICell], header: UISectionHeader? = nil) {
+    public init(cells: [UICellDescriptor], header: UISectionHeader? = nil) {
       self.cells = cells
       self.header = header
     }
@@ -30,7 +52,7 @@ public class UITableComponentProps: UIPropsProtocol {
     return sections.filter { $0.hasDistinctKeys }.count == sections.count
   }
   /// Returns all of the components across the different sections.
-  public var allComponents: [UIComponentProtocol] {
+  public var allComponent: [UIComponentProtocol] {
     var components: [UIComponentProtocol] = []
     for section in sections {
       components.append(contentsOf: section.cells.flatMap { $0.component })
@@ -38,7 +60,7 @@ public class UITableComponentProps: UIPropsProtocol {
     return components
   }
 
-  public typealias UITableNodeConfigurationClosure = UINode<UITableView>.UINodeConfigurationClosure
+  public typealias UITableNodeConfigurationClosure = UINode<UITableView>.ConfigurationClosure
 
   /// *UITableView* configuration closure.
   /// - note: Use this to configure layout properties such as padding, margin and such.
@@ -52,7 +74,7 @@ public class UITableComponentProps: UIPropsProtocol {
     configuration = configure ?? configuration
   }
 
-  public convenience init(cells: [UICell],
+  public convenience init(cells: [UICellDescriptor],
                           header: UISectionHeader? = nil,
                           configure: UITableNodeConfigurationClosure? = nil) {
     self.init()
@@ -75,6 +97,7 @@ public class UITableComponent<S: UIStateProtocol, P: UITableComponentProps>:
   }
   private var tableNode: UINodeProtocol!
   private var cellContext: UIContext!
+  private var prototypes: [String: UIView] = [:]
 
   public required init(context: UIContextProtocol, key: String?) {
     guard let key = key else {
@@ -101,9 +124,11 @@ public class UITableComponent<S: UIStateProtocol, P: UITableComponentProps>:
       table.delegate = self
       table.separatorStyle = .none
       table.estimatedRowHeight = 64
+      table.rowHeight = UITableViewAutomaticDimension
+      table.allowsMultipleSelection = false
       return table
     }
-    return UINode<UITableView>(reuseIdentifier: "UITableComponent",
+    return UINode<UITableView>(reuseIdentifier: string(fromType: UITableComponent.self),
                                key: key,
                                create: makeTable) { [weak self] config in
       guard let `self` = self else {
@@ -111,8 +136,8 @@ public class UITableComponent<S: UIStateProtocol, P: UITableComponentProps>:
       }
       let table = config.view
       // Default configuration.
-      config.set(\UITableView.yoga.width, self.context?.canvasView?.bounds.size.width ?? 0)
-      config.set(\UITableView.yoga.height, self.context?.canvasView?.bounds.size.height ?? 0)
+      config.set(\UITableView.yoga.width, context.screen.canvasSize.width)
+      config.set(\UITableView.yoga.height, context.screen.canvasSize.height)
       // Custom configuration.
       self.props.configuration(config)
       /// Implements padding as content insets.
@@ -123,13 +148,19 @@ public class UITableComponent<S: UIStateProtocol, P: UITableComponentProps>:
     }
   }
 
+  /// Called when ⌘ + R is pressed to reload the component.
+  override func forceComponentReload() {
+    try? UIStylesheetManager.default.load(file: nil)
+    self.setNeedsRender()
+  }
+
   public func setNeedRenderInvoked(on context: UIContextProtocol, component: UIComponentProtocol) {
-    cellContext.canvasView = tableView
-    root.unmanagedChildren = props.allComponents.map { $0.asNode() }
+    cellContext._canvasView = tableView
     // Change comes from one of the parent components.
     if context === self.context {
       // TODO: Integrate IGListDiff algorithm.
       tableView?.reloadData()
+
     // Change come from one of the children component.
     } else if context === self.cellContext {
       tableView?.beginUpdates()
@@ -139,7 +170,7 @@ public class UITableComponent<S: UIStateProtocol, P: UITableComponentProps>:
 
   // Returns 'true' if the component passed as argument is a child of this table.
   private func componentIsChild(_ component: UIComponentProtocol) -> Bool {
-    for child in props.allComponents {
+    for child in props.allComponent {
       if componentIsEqual(child, component) { return true }
     }
     return false
@@ -169,28 +200,53 @@ public class UITableComponent<S: UIStateProtocol, P: UITableComponentProps>:
   /// Asks the data source for a cell to insert in a particular location of the table view.
   public func tableView(_ tableView: UITableView,
                         cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let component = props.sections[indexPath.section].cells[indexPath.row].component
-    component.delegate = self
-    let node = component.asNode()
-    let reuseIdentifier = node.reuseIdentifier
-    // Dequeue the right cell.
+    let cellInfo = props.sections[indexPath.section].cells[indexPath.row]
+    let component = cellInfo.component
+    let _ = component.asNode()
+    let reuseIdentifier = String(describing: type(of: component))
     let cell: UITableComponentCell =
       tableView.dequeueReusableCell(withIdentifier: reuseIdentifier) as? UITableComponentCell
       ?? UITableComponentCell(style: .default, reuseIdentifier: reuseIdentifier)
-    // Mounts the new node.
-    cell.mount(component: component, width: tableView.bounds.size.width)
-
+    component.delegate = self
+    disableImplicitAnimations {
+      cell.selectionStyle = cellInfo.selectionStyle
+      cell.mount(component: component, width: tableView.bounds.size.width)
+    }
     return cell
   }
 
   /// Asks the delegate for the height to use for a row in a specified location.
   public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    let node = props.sections[indexPath.section].cells[indexPath.row].component.asNode()
-    let prototypeView = UIView()
-    node.reconcile(in: prototypeView,
-                   size: CGSize(width: tableView.bounds.size.width, height: CGFloat.max),
-                   options: [.preventDelegateCallbacks])
-    return prototypeView.subviews.first?.bounds.size.height ?? 0
+    let section = props.sections[indexPath.section]
+    if let height = section.defaultRowHeight { return height }
+    let component = props.sections[indexPath.section].cells[indexPath.row].component
+    let node = component.asNode()
+    let reuseIdentifier = String(describing: type(of: component))
+
+    if prototypes[reuseIdentifier] == nil {
+      prototypes[reuseIdentifier] = UIView()
+    }
+    let prototypeView = prototypes[reuseIdentifier]!
+    disableImplicitAnimations {
+      node.reconcile(in: prototypeView,
+                     size: CGSize(width: tableView.bounds.size.width, height: CGFloat.max),
+                     options: [.preventDelegateCallbacks])
+    }
+    return heightForComponentView(prototypeView.subviews.first)
+  }
+
+  private func heightForComponentView(_ view: UIView?) -> CGFloat {
+    guard let cv = view else { return 0 }
+    return cv.bounds.size.height + cv.yoga.marginTop.normal + cv.yoga.marginBottom.normal
+  }
+
+  private func disableImplicitAnimations(closure: () -> Void) {
+    UIView.performWithoutAnimation {
+      CATransaction.begin()
+      CATransaction.setValue(kCFBooleanTrue, forKey: kCATransactionDisableActions)
+      closure()
+      CATransaction.commit()
+    }
   }
 
   /// Asks the delegate for a view object to display in the header of the specified section of
@@ -208,6 +264,29 @@ public class UITableComponent<S: UIStateProtocol, P: UITableComponentProps>:
     return view
   }
 
+  /// Tells the delegate that the specified row is now selected.
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let component = props.sections[indexPath.section].cells[indexPath.row].component
+    guard let cellProp = component.anyProp as? UITableCellProps else { return }
+    cellProp.onCellSelected?()
+
+    for idx in tableView.indexPathsForVisibleRows ?? [] where indexPath != idx {
+      highlightCell(false, at: idx)
+    }
+    highlightCell(true, at: indexPath)
+  }
+
+  public func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+    highlightCell(false, at: indexPath)
+  }
+
+  private func highlightCell(_ isHighlighted: Bool, at indexPath: IndexPath) {
+    let component = props.sections[indexPath.section].cells[indexPath.row].component
+    guard let cellProp = component.anyProp as? UITableCellProps else { return }
+    cellProp.isHighlighted = isHighlighted
+    component.setNeedsRender(options: [])
+  }
+
   /// Asks the delegate for the height to use for the header of a particular section.
   public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat{
     guard let header = props.sections[section].header else {
@@ -219,7 +298,7 @@ public class UITableComponent<S: UIStateProtocol, P: UITableComponentProps>:
                                         size: CGSize(width: width, height: CGFloat.max),
                                         options: [.preventDelegateCallbacks])
 
-    return view.subviews.first?.bounds.size.height ?? 0
+    return heightForComponentView(view.subviews.first)
   }
 
   /// Retrieves the component from the context for the key passed as argument.
@@ -229,14 +308,14 @@ public class UITableComponent<S: UIStateProtocol, P: UITableComponentProps>:
   /// - parameter props: Configurations and callbacks passed down to the component.
   public func cell<S, P, C: UIComponent<S, P>>(_ type: C.Type,
                                                key: String? = nil,
-                                               props: P = P()) -> UICell {
+                                               props: P = P()) -> UICellDescriptor {
     var component: UIComponentProtocol!
     if let key = key {
       component = cellContext.component(type, key: key, props: props, parent: nil)
     } else {
       component = cellContext.transientComponent(type, props: props, parent: nil)
     }
-    return UICell(component: component)
+    return UICellDescriptor(component: component)
   }
 
   /// Retieves a component that is suitable as a table header.
@@ -245,22 +324,33 @@ public class UITableComponent<S: UIStateProtocol, P: UITableComponentProps>:
                                                  props: P = P()) -> UISectionHeader {
     return cell(type, key: key, props: props)
   }
+
+  public override func dispose() {
+    super.dispose()
+    cellContext.dispose()
+  }
 }
 
 // MARK: - UICell
 
-public final class UICell {
+public final class UICellDescriptor {
   /// The constructed component.
   public let component: UIComponentProtocol
+  /// The style of selected cells.
+  public var selectionStyle: UITableViewCellSelectionStyle
   // Internal constructor.
-  init(component: UIComponentProtocol) {
+  init(component: UIComponentProtocol,
+       selectionStyle: UITableViewCellSelectionStyle = .none) {
     self.component = component
+    self.selectionStyle = selectionStyle
   }
 }
 
-public typealias UISectionHeader = UICell
+public typealias UISectionHeader = UICellDescriptor
 
-/// Components that are embedded in cells have a different context.
+// MARK: - UICellContext
+
+/// Component that are embedded in cells have a different context.
 public final class UICellContext: UIContext {
   /// Layout animator is not available for cells.
   public override var layoutAnimator: UIViewPropertyAnimator? {
@@ -268,7 +358,14 @@ public final class UICellContext: UIContext {
     set { }
   }
 
-  public override func flushObsoleteStates(validKeys: Set<String>) {
+  public override var canvasSize: CGSize {
+    guard let context = _parentContext as? UIContext else {
+      return .zero
+    }
+    return context.canvasSize
+  }
+
+  public override func flushObsoleteState(validKeys: Set<String>) {
     /// The lifetime of the cells is diffirent from traditional components due to recycling
     /// and managed from *UITableComponent*.
   }
@@ -296,12 +393,17 @@ public class UITableComponentCell: UITableViewCell {
     fatalError("init(coder:) has not been implemented")
   }
 
-  public func mount(component: UIComponentProtocol, width: CGFloat) {
+  /// Install the component passed as argument in the *UITableViewCell*'s view hierarchy.
+  /// - Note: This API is not called from *UITableComponent*.
+  public func install(component: UIComponentProtocol, width: CGFloat) {
+    let _ = component.asNode()
+    mount(component: component, width: width)
+  }
+
+  func mount(component: UIComponentProtocol, width: CGFloat) {
     self.component = component
     component.setCanvas(view: contentView, options: [])
-    component.canvasSize = {
-      return CGSize(width: width, height: CGFloat.max)
-    }
+
     // We purposely wont re-generate the node (by calling *asNode()*) because this has already
     // been called in the 'heightForRowAt' delegate method.
     // We just install the node in the right view hierarchy.

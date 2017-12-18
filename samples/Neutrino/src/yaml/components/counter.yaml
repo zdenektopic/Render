@@ -1,0 +1,27 @@
+Counter.wrapper:
+  backgroundColor: *_text
+  justifyContent: ${center}
+  width: ${canvasSize.width}
+
+Counter.button:
+  animator: &_animator animator(0.2,easeIn)
+  backgroundColorImage: "#00ff00"
+  font: *_medium
+  padding: 4
+  width: 180
+  height: 44
+  alignSelf: ${center}
+  margin: 16
+  depthPreset: 2
+  cornerRadius: 12
+  animator-cornerRadius: *_animator
+Counter.button.even: 
+  backgroundColorImage: "#ff0000"
+  cornerRadius: 0
+  animator-cornerRadius: *_animator
+
+Counter.label:
+  font: *_smallBold 
+  color: *_white
+  textAlignment: ${NSTextAlignment.center}
+  padding: 8
